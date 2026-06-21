@@ -22,7 +22,8 @@
                 Driver App Simulator
             </h2>
             <p class="text-xs text-gray-500 mb-1" id="deviceInfo">Device ID: —</p>
-            <p class="text-xs text-gray-400 mb-4" id="apiUrlInfo">API: —</p>
+            <p class="text-xs text-gray-400 mb-1" id="apiUrlInfo">API: —</p>
+            <p class="text-xs font-mono mb-4" id="keyDisplay">🔑 Idempotency Key: <span class="text-blue-600 font-semibold">—</span></p>
             
             <div id="pendingAlert" class="hidden mb-6 bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-md">
                 <div class="flex">
@@ -88,6 +89,7 @@
         const terminal = document.getElementById('terminal');
         const pendingAlert = document.getElementById('pendingAlert');
         const pendingKeyText = document.getElementById('pendingKeyText');
+        const keyDisplay = document.getElementById('keyDisplay');
 
         // Show device info for multi-device testing
         function getDeviceId() {
@@ -99,12 +101,23 @@
             return deviceId;
         }
 
+        // Update the key display on the UI
+        function updateKeyDisplay() {
+            const savedKey = localStorage.getItem(STORAGE_KEY);
+            if (savedKey) {
+                keyDisplay.innerHTML = `🔑 Idempotency Key: <span class="text-blue-600 font-semibold">${savedKey}</span>`;
+            } else {
+                keyDisplay.innerHTML = `🔑 Idempotency Key: <span class="text-gray-400">(none — will generate on next request)</span>`;
+            }
+        }
+
         // Check local storage on page load
         function checkStorage() {
             const savedKey = localStorage.getItem(STORAGE_KEY);
             const deviceId = getDeviceId();
             document.getElementById('deviceInfo').innerText = `Device ID: ${deviceId}`;
             document.getElementById('apiUrlInfo').innerText = `API: ${API_BASE_URL || '(same origin)'}`;
+            updateKeyDisplay();
             if (savedKey) {
                 pendingAlert.classList.remove('hidden');
                 pendingKeyText.innerText = `Key: ${savedKey}`;
@@ -175,14 +188,14 @@
                 const result = await response.json();
                 
                 if (response.ok) {
-                    log(`[Success] Server Response: HTTP ${response.status}\nBody: ${JSON.stringify(result, null, 2)}`, 'text-green-400');
+                    log(`[Success] Server Response: HTTP ${response.status}\nIdempotency Key: ${idempotencyKey}\nBody: ${JSON.stringify(result, null, 2)}`, 'text-green-400');
                     
                     // 4. CLEANUP: Only remove key when we successfully finish
                     localStorage.removeItem(STORAGE_KEY);
                     log(`[Cleanup] Key removed from local storage.`, 'text-gray-400');
                     checkStorage();
                 } else {
-                    log(`[Error] Server Response: HTTP ${response.status}\nBody: ${JSON.stringify(result)}`, 'text-red-400');
+                    log(`[Error] Server Response: HTTP ${response.status}\nIdempotency Key: ${idempotencyKey}\nBody: ${JSON.stringify(result)}`, 'text-red-400');
                 }
 
             } catch (err) {
