@@ -1,0 +1,16 @@
+{
+  "name": "trip-idempotency-demo",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "@upstash/redis": "^1.34.0",
+    "cors": "^2.8.6",
+    "crypto": "^1.0.1",
+    "express": "^4.22.2",
+    "ioredis": "^5.11.1"
+  }
+}
