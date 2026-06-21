@@ -17,6 +17,12 @@ app.post('/api/trips/start', async (req, res) => {
   // Notice we extract 'simulateLag' from the incoming request body
   const { driverId, vehicleNumber, startLocation, simulateLag, deviceId } = req.body;
 
+  console.log(`\n========== INCOMING REQUEST ==========`);
+  console.log(`[Idempotency-Key] ${idempotencyKey}`);
+  console.log(`[Driver] ${driverId}`);
+  console.log(`[Device] ${deviceId || 'unknown'}`);
+  console.log(`======================================\n`);
+
   if (!idempotencyKey) {
     return res.status(400).json({ error: 'Idempotency-Key header is mandatory.' });
   }

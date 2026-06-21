@@ -33,6 +33,12 @@ async function handleStartTrip(req, res) {
   const idempotencyKey = req.headers['idempotency-key'];
   const { driverId, vehicleNumber, startLocation, simulateLag } = req.body;
 
+  console.log(`\n========== INCOMING REQUEST ==========`);
+  console.log(`[Idempotency-Key] ${idempotencyKey}`);
+  console.log(`[Driver] ${driverId}`);
+  console.log(`[Vehicle] ${vehicleNumber}`);
+  console.log(`======================================\n`);
+
   if (!idempotencyKey) {
     return res.status(400).json({ error: 'Idempotency-Key header is mandatory.' });
   }
